@@ -30,7 +30,9 @@ For more details see [GitHub Flavored Markdown](https://guides.github.com/featur
 
 ### Find me on
 
-[![Twitter](assets/images/twitter.png)](http://www.twitter.com/crahan)
+[![Twitter](assets/images/twitter.png)](https://www.twitter.com/crahan)
+[![Instagram](assets/images/instagram.png)](https://instagram.com/crahan)
+[![Github](assets/images/github.png)](https://github.com/crahan)
 
 ### Jekyll Themes
 
