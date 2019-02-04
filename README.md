@@ -1,6 +1,6 @@
 ## KringleCon
 
-Looking for my KringleCon writeup? [Et voila!](files/CraHan%20-%20KringleCon%202018%20writeup.pdf)
+Looking for my KringleCon 2018 writeup? [Et voila!](files/CraHan%20-%20KringleCon%202018%20writeup.pdf)
 
 ```bash
 #!/bin/bash
