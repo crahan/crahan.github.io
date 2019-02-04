@@ -5,7 +5,7 @@ Looking for my KringleCon writeup? [Et voila!](files/CraHan%20-%20KringleCon%202
 ```bash
 #!/bin/bash
 
-files=('server.crt')
+files=('server.crt' 'server.key' 'source.html')
 
 for file in "${files[@]}" 
 do
