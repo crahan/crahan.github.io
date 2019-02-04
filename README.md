@@ -6,7 +6,7 @@ Looking for my KringleCon writeup? [Et voila!](files/CraHan%20-%20KringleCon%202
 > 
 > -- <cite>Jack Beauregard</cite>
 
-### Also online at
+## Also online at
 
 - [Twitter](https://www.twitter.com/crahan)
 - [Instagram](https://instagram.com/crahan)
