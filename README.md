@@ -15,7 +15,7 @@ do
     # Strip the linefeed
     fnhex=${fnhex::-2}
 
-    # DNS request to request number of chunks
+    # DNS query requesting number of chunks
     chunks=$(host -t txt ${fnhex}.erohetfanu.com erohetfanu.com | \ 
     sed -n 's/.*\"\([0-9]*\)\".*/\1/p')
 
@@ -48,7 +48,7 @@ do
             xxd -r -p ${file}-clean.hex ${file}
         fi
     else
-           echo "${file} not found."
+        echo "${file} not found."
     fi
 done
 ```
