@@ -28,6 +28,12 @@ Syntax highlighted code block
 
 For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
 
+### Find me on
+
+[![Twitter](assets/images/twitter.png)](https://www.twitter.com/crahan)
+[![Instagram](assets/images/instagram.png)](https://instagram.com/crahan)
+[![Github](assets/images/github.png)](https://github.com/crahan)
+
 ### Jekyll Themes
 
 Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/crahan/crahan.github.io/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
