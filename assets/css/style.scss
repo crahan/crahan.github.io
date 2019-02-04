@@ -2,17 +2,3 @@
 ---
 
 @import "{{ site.theme }}";
-
-header {
-    background: #303136;
-    border-bottom: 1px solid #18181b;
-}
-
-header h1 {
-    font-size: 32px;
-    color: #eee;
-}
-
-header p {
-    color: #ccc;
-}
