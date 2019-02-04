@@ -33,6 +33,7 @@ For more details see [GitHub Flavored Markdown](https://guides.github.com/featur
 [![Twitter](assets/images/twitter.png)](https://www.twitter.com/crahan)
 [![Instagram](assets/images/instagram.png)](https://instagram.com/crahan)
 [![Github](assets/images/github.png)](https://github.com/crahan)
+[![Pinboard](assets/images/pinboard.png)](https://pinboard.in/u:crahan)
 
 ### Jekyll Themes
 
