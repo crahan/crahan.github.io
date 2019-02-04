@@ -4,6 +4,14 @@
 @import "{{ site.theme }}";
 
 header {
-    background: #222;
-    border-bottom: 1px solid #444;
+    background: #333;
+    border-bottom: 1px solid #555;
+}
+
+header h1 {
+    color: #eee;
+}
+
+header p {
+    color: #eee;
 }
