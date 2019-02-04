@@ -16,7 +16,8 @@ do
     fnhex=${fnhex::-2}
 
     # DNS request to request number of chunks
-    chunks=$(host -t txt ${fnhex}.erohetfanu.com erohetfanu.com | sed -n 's/.*\"\([0-9]*\)\".*/\1/p')
+    chunks=$(host -t txt ${fnhex}.erohetfanu.com erohetfanu.com | \ 
+    sed -n 's/.*\"\([0-9]*\)\".*/\1/p')
 
     # Check if value was returned
     if [ $chunks > 0 ]
@@ -34,7 +35,8 @@ do
                 remainder=$(( chunk % 100 ))
                 [ "$remainder" -eq 0 ] && echo -n "${chunk}..."
 
-                host -t txt ${chunk}.${fnhex}.erohetfanu.com erohetfanu.com | sed -n 's/.*\"\(.*\)\".*/\1/p' >> "${file}.hex"
+                host -t txt ${chunk}.${fnhex}.erohetfanu.com erohetfanu.com | \
+                sed -n 's/.*\"\(.*\)\".*/\1/p' >> "${file}.hex"
             done
 
             printf "done.\n\n"
