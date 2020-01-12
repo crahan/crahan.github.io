@@ -1,4 +1,4 @@
-## 2018 SANS Holiday Hack Challenge Write-Up
+## SANS Holiday Hack Challenge Write-Ups
 
 Looking for my 2018 write-up? [Et voila!](files/CraHan%20-%20KringleCon%202018%20writeup.pdf)
 
