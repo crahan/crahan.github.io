@@ -1,6 +1,6 @@
-## SANS Holiday Hack Challenge
+## 2018 SANS Holiday Hack Challenge Write-Up
 
-Looking for my 2018 SANS Holiday Hack Challenge writeup? [Et voila!](files/CraHan%20-%20KringleCon%202018%20writeup.pdf)
+Looking for my 2018 SANS Holiday Hack Challenge write-up? [Et voila!](files/CraHan%20-%20KringleCon%202018%20writeup.pdf)
 
 ```bash
 #!/bin/bash
