@@ -1,56 +1,91 @@
 ## SANS Holiday Hack Challenge Write-Ups
 
-Looking for my 2018 write-up? [Et voila!](files/CraHan%20-%20KringleCon%202018%20writeup.pdf)
+2018: [download](files/CraHan%20-%20KringleCon%202018%20writeup.pdf)
+2019: [write-up website](https://n00.be/HolidayHackChallenge2019/) or [YouTube playlist](https://www.youtube.com/playlist?list=PLkC9YoWVx3xKJgL7TrBsjmy8triY9RDjC)
 
-```bash
-#!/bin/bash
 
-files=('server.crt' 'server.key' 'source.html')
+```python
+#!/usr/bin/env python3
+"""SANS Holiday Hack Challenge 2019 - Recover Cleartext Document."""
+from Crypto.Cipher import DES
 
-for file in "${files[@]}" 
-do
-    # Convert filename to hex
-    fnhex=$(xxd -pu <<< $file)
+seed = 0
 
-    # Strip the linefeed
-    fnhex=${fnhex::-2}
 
-    # DNS query requesting number of chunks
-    chunks=$(host -t txt ${fnhex}.erohetfanu.com erohetfanu.com | \ 
-    sed -n 's/.*\"\([0-9]*\)\".*/\1/p')
+def rand():
+    """Generate random value."""
+    # 1. get seed value
+    # 2. multiply seed by 214013
+    # 3. add 2531011 (new seed value)
+    # 4. right shift
+    # 5. bitwise AND with 32767
+    global seed
+    seed = (214013 * seed + 2531011)
+    val = seed >> 16
+    return (val & 32767)
 
-    # Check if value was returned
-    if [ $chunks > 0 ]
-    then
-        echo "${file} found (${chunks} chunks)."
 
-        if [ "$1" != "recon" ]
-        then
-            # Grab the file and save it to ${file}.hex
-            echo -n "Grabbing chunk: "
-            chunks=$(expr $chunks - 1)
+def generate_key(val):
+    """Generate encryption key."""
+    global seed
+    seed = val
+    encrypted = []
+    for _x in range(8):
+        tmp = hex(rand())
+        if len(str(tmp)) == 6:
+            encrypted.append(str(tmp)[4:])
+        elif len(str(tmp)) == 5:
+            encrypted.append(str(tmp)[3:])
+        elif len(str(tmp)) == 4:
+            encrypted.append(str(tmp)[2:])
+        elif len(str(tmp)) == 3:
+            encrypted.append(f"0{str(tmp)[-1]}")
+    return ''.join(encrypted)
 
-            for chunk in $(eval echo "{0..$chunks}")
-            do
-                remainder=$(( chunk % 100 ))
-                [ "$remainder" -eq 0 ] && echo -n "${chunk}..."
 
-                host -t txt ${chunk}.${fnhex}.erohetfanu.com erohetfanu.com | \
-                sed -n 's/.*\"\(.*\)\".*/\1/p' >> "${file}.hex"
-            done
+def main():
+    """Execute."""
+    # File names
+    encinfile = 'ElfUResearchLabsSuperSledOMaticQuickStartGuideV1.2.pdf.enc'
+    pdfoutfile = 'ElfUResearchLabsSuperSledOMaticQuickStartGuideV1.2.pdf'
 
-            printf "done.\n\n"
-            
-            # remove \n
-            cat ${file}.hex | tr -d '\n' > ${file}-clean.hex
+    # Friday, December 6, 2019 7:00:00 PM
+    start = 1575658800
 
-            # convert back to binary
-            xxd -r -p ${file}-clean.hex ${file}
-        fi
-    else
-        echo "${file} not found."
-    fi
-done
+    # Loop over 2 hours and generate the key for each
+    for x in range(7200):
+        keyseed = start + x
+        key = generate_key(keyseed)
+        bytekey = bytearray.fromhex(key)
+
+        # Prep for decrypting DES-CBC
+        cipher = DES.new(
+            bytekey,
+            DES.MODE_CBC,
+            iv=bytearray.fromhex('0000000000000000')
+        )
+
+        # Read encrypted file
+        f = open(encinfile, 'rb')
+        encrypted = f.read()
+
+        # Decrypt using the current key
+        msg = (cipher.iv + cipher.decrypt(encrypted))
+
+        # Check if decryption was successful
+        if msg[9:12] == b'PDF':
+            # Yes, we got a PDF!
+            print(f'Pass {x}: {key} decrypts to a PDF!')
+            f = open(pdfoutfile, 'wb')
+            f.write(msg)
+            break
+        else:
+            # Womp womp! On to the next.
+            print(f'Pass {x}: {key} is no bueno!')
+
+
+if __name__ == "__main__":
+    main()
 ```
 
 ## Random
