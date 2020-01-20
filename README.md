@@ -1,6 +1,6 @@
 ## SANS Holiday Hack Challenge Write-Ups
 
-2018: [download](files/CraHan%20-%20KringleCon%202018%20writeup.pdf)
+2018: [download](files/CraHan%20-%20KringleCon%202018%20writeup.pdf)  
 2019: [write-up website](https://n00.be/HolidayHackChallenge2019/) or [YouTube playlist](https://www.youtube.com/playlist?list=PLkC9YoWVx3xKJgL7TrBsjmy8triY9RDjC)
 
 
