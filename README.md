@@ -5,10 +5,11 @@
 
 ```python
 #!/usr/bin/env python3
-"""SANS Holiday Hack Challenge 2020 - Naughty/Nice List with Blockchain Investigation Part 1"""
+"""SANS Holiday Hack Challenge 2020 - Naughty/Nice List Part 1"""
 from mt19937 import mt19937, untemper
 from mt19937predictor import MT19937Predictor
 from naughty_nice import Block, Chain
+
 
 def extract_number_64(tliston):
     # grab 2 32-bit random values
