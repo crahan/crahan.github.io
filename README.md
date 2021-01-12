@@ -5,85 +5,91 @@
 
 ```python
 #!/usr/bin/env python3
-"""SANS Holiday Hack Challenge 2019 - Recover Cleartext Document."""
-from Crypto.Cipher import DES
+"""SANS Holiday Hack Challenge 2020 - Naughty/Nice List with Blockchain Investigation Part 1"""
+from mt19937 import mt19937, untemper
+from mt19937predictor import MT19937Predictor
+from naughty_nice import Block, Chain
 
-seed = 0
-
-
-def rand():
-    """Generate random value."""
-    # 1. get seed value
-    # 2. multiply seed by 214013
-    # 3. add 2531011 (new seed value)
-    # 4. right shift
-    # 5. bitwise AND with 32767
-    global seed
-    seed = (214013 * seed + 2531011)
-    val = seed >> 16
-    return (val & 32767)
+def extract_number_64(tliston):
+    # grab 2 32-bit random values
+    next1 = tliston.extract_number()
+    next2 = tliston.extract_number()
+    # transform them into a 64-bit value
+    bytes = bytearray()
+    bytes += next2.to_bytes(4, byteorder='big')
+    bytes += next1.to_bytes(4, byteorder='big')
+    return int.from_bytes(bytes, byteorder='big')
 
 
-def generate_key(val):
-    """Generate encryption key."""
-    global seed
-    seed = val
-    encrypted = []
-    for _x in range(8):
-        tmp = hex(rand())
-        if len(str(tmp)) == 6:
-            encrypted.append(str(tmp)[4:])
-        elif len(str(tmp)) == 5:
-            encrypted.append(str(tmp)[3:])
-        elif len(str(tmp)) == 4:
-            encrypted.append(str(tmp)[2:])
-        elif len(str(tmp)) == 3:
-            encrypted.append(f"0{str(tmp)[-1]}")
-    return ''.join(encrypted)
+if __name__ == '__main__':
+    # load the blockchain file
+    c2 = Chain(load=True, filename='blockchain.dat')
 
+    # print some blockchain stats
+    print(f'The chain contains {len(c2.blocks)} blocks')
+    print(f'First block has index {c2.blocks[0].index}')
+    print(f'Last block has index {c2.blocks[-1].index}')
+    
+    # get the nonce values from the blocks
+    nonce_list = []
+    for block in c2.blocks:
+        nonce_list.append(block.nonce)
 
-def main():
-    # File names
-    encinfile = 'ElfUResearchLabsSuperSledOMaticQuickStartGuideV1.2.pdf.enc'
-    pdfoutfile = 'ElfUResearchLabsSuperSledOMaticQuickStartGuideV1.2.pdf'
+    # create a kmyk MT19937 PRNG predictor 
+    # https://github.com/kmyk/mersenne-twister-predictor
+    kmyk = MT19937Predictor()
 
-    # Friday, December 6, 2019 7:00:00 PM
-    start = 1575658800
+    # create a Tom Liston MT19937 PRNG predictor 
+    # https://github.com/tliston/mt19937
+    tliston = mt19937(0)
 
-    # Loop over a 2-hour time frame
-    for x in range(7200):
-        keyseed = start + x
-        key = generate_key(keyseed)
-        bytekey = bytearray.fromhex(key)
+    # use all but the final 5 nonces for kmyk
+    for nonce in nonce_list[:-5]:
+        kmyk.setrandbits(nonce, 64)
 
-        # Prep for decrypting DES-CBC
-        cipher = DES.new(
-            bytekey,
-            DES.MODE_CBC,
-            iv=bytearray.fromhex('0000000000000000')
-        )
+    # use 312 64-bit nonces, excluding the final 5, for tliston
+    idx = 0
+    for nonce in nonce_list[-317:-5]:
+        # least significant 32-bit
+        tliston.MT[idx] = untemper(nonce & 0xFFFFFFFF)
+        # most significant 32-bit
+        tliston.MT[idx+1] = untemper((nonce >> 32) & 0xFFFFFFFF)
+        idx += 2
 
-        # Read encrypted data
-        f = open(encinfile, 'rb')
-        encrypted = f.read()
+    # generate the next 5 values and compare them to the final 5 in the blockchain
+    print('\nVerifying correctness using the last 5 blockchain nonces:')
+    print('\nIndex   kmyk              tliston           Blockchain        Check')
+    for i in range(5):
+        # blockchain verification value
+        nonce_next = nonce_list[-5+i]
+        # next kmyk value
+        kmyk_next = kmyk.getrandbits(64)
+        # next tliston value
+        tliston_next = extract_number_64(tliston)
+        # comparison table
+        print('%i  %16.16x  %16.16x  %16.16x  %r' % (
+            c2.blocks[-5+i].index,
+            kmyk_next,
+            tliston_next,
+            nonce_next,
+            (kmyk_next == tliston_next == nonce_next)
+        ))
+        assert(kmyk_next == tliston_next == nonce_next)
 
-        # Decrypt using the current key
-        msg = (cipher.iv + cipher.decrypt(encrypted))
-
-        # Check if decryption was successful
-        if msg[9:12] == b'PDF':
-            # Yes, we got a PDF!
-            print(f'Pass {x}: {key} decrypts to a PDF!')
-            f = open(pdfoutfile, 'wb')
-            f.write(msg)
-            break
-        else:
-            # Womp womp! On to the next.
-            print(f'Pass {x}: {key} is no bueno!')
-
-
-if __name__ == "__main__":
-    main()
+    # predict the next 4 random values
+    print('\nGenerating the next values:')
+    print('\nIndex   kmyk              tliston')
+    for i in range(4):
+        # kmyk answer
+        kmyk_next = kmyk.getrandbits(64)
+        # tliston answer
+        tliston_next = extract_number_64(tliston)
+        # prediction table
+        print('%i  %16.16x  %16.16x' % (
+            c2.blocks[-1].index + i + 1,
+            kmyk_next,
+            tliston_next,
+        ))
 ```
 
 ## Random
