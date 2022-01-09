@@ -66,7 +66,11 @@ async def bruteforce(pick_one: bool):
 
         # Configure the progressbar
         bar_format = "{l_bar}{bar:30}| {n_fmt}/{total_fmt} [{elapsed}]"
-        progressbar = tqdm.tqdm(asyncio.as_completed(tasks), total=len(tasks), bar_format=bar_format)
+        progressbar = tqdm.tqdm(
+            asyncio.as_completed(tasks),
+            total=len(tasks),
+            bar_format=bar_format
+        )
         progressbar.set_description("Frostavating")
         results = []
 
