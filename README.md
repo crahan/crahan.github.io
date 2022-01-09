@@ -22,31 +22,31 @@ GATES = ['AND', 'NAND', 'OR', 'NOR', 'XOR', 'XNOR']
 
 def create_ascii_board(layout: list) -> str:
     """Create an ASCII panel layout."""
-    g0 = f"{GATES[layout[0]]:^6}"
-    g1 = f"{GATES[layout[1]]:^6}"
-    g2 = f"{GATES[layout[2]]:^6}"
-    g3 = f"{GATES[layout[3]]:^6}"
-    g4 = f"{GATES[layout[4]]:^6}"
-    g5 = f"{GATES[layout[5]]:^6}"
+    g0 = f'{GATES[layout[0]]:^6}'
+    g1 = f'{GATES[layout[1]]:^6}'
+    g2 = f'{GATES[layout[2]]:^6}'
+    g3 = f'{GATES[layout[3]]:^6}'
+    g4 = f'{GATES[layout[4]]:^6}'
+    g5 = f'{GATES[layout[5]]:^6}'
 
     return (
-        "Logic board layout:\n\n"
-        "  +------+   +------+   +------+\n"
-        f"  |{g0}|   |{g1}|   |{g2}|\n"
-        "  +------+   +------+   +------+\n"
-        "  +------+   +------+   +------+\n"
-        f"  |{g3}|   |{g4}|   |{g5}|\n"
-        "  +------+   +------+   +------+"
+        'Logic board layout:\n\n'
+        '  +------+   +------+   +------+\n'
+        f'  |{g0}|   |{g1}|   |{g2}|\n'
+        '  +------+   +------+   +------+\n'
+        '  +------+   +------+   +------+\n'
+        f'  |{g3}|   |{g4}|   |{g5}|\n'
+        '  +------+   +------+   +------+'
     )
 
 
 async def fetch(
         session: aiohttp.ClientSession,
         perm: Tuple[int, ...]) -> Tuple[Optional[str], Tuple[int, ...]]:
-    """Have the Frostavator check a single permutation."""
-    url = "https://frostavator21.kringlecastle.com/check"
+    """Request the Frostavator to check a single permutation."""
+    url = 'https://frostavator21.kringlecastle.com/check'
     headers = {'dataType': 'json', 'contentType': 'application/json'}
-    data = {'id': "abc-123", 'config': perm}
+    data = {'id': 'abc-123', 'config': perm}
 
     async with session.post(url, headers=headers, json=data) as response:
         resp = await response.json()
@@ -65,13 +65,13 @@ async def bruteforce(pick_one: bool):
             tasks.append(asyncio.create_task(fetch(session, perm)))
 
         # Configure the progressbar
-        bar_format = "{l_bar}{bar:30}| {n_fmt}/{total_fmt} [{elapsed}]"
+        bar_format = '{l_bar}{bar:30}| {n_fmt}/{total_fmt} [{elapsed}]'
         progressbar = tqdm.tqdm(
             asyncio.as_completed(tasks),
             total=len(tasks),
             bar_format=bar_format
         )
-        progressbar.set_description("Frostavating")
+        progressbar.set_description('Frostavating')
         results = []
 
         # Gather the results
@@ -84,14 +84,14 @@ async def bruteforce(pick_one: bool):
         if pick_one:
             # Print one random entry
             winner = list(valids[random.randrange(0, len(valids))])
-            print(f"frostavatorData: {winner}")
+            print(f'frostavatorData: {winner}')
             print(create_ascii_board(winner))
         else:
             # Print all entries
             print(f"All {len(valids)} valid 'frostavatorData' values:")
 
             for valid in valids:
-                print(f"{list(valid)} or {[GATES[x] for x in valid]}")
+                print(f'{list(valid)} or {[GATES[x] for x in valid]}')
 
 
 @click.command()
