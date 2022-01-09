@@ -1,97 +1,107 @@
 ## SANS Holiday Hack Challenge Write-Ups
 
+2021: [write-up website](https://n00.be/HolidayHackChallenge2021/)
 2020: [write-up website](https://n00.be/HolidayHackChallenge2020/)  
 2019: [write-up website](https://n00.be/HolidayHackChallenge2019/) or [YouTube playlist](https://www.youtube.com/playlist?list=PLkC9YoWVx3xKJgL7TrBsjmy8triY9RDjC)  
 2018: [PDF write-up](files/CraHan%20-%20KringleCon%202018%20writeup.pdf) 
 
 ```python
-#!/usr/bin/env python3
-"""SANS Holiday Hack Challenge 2020 - Naughty/Nice List Part 1"""
-from mt19937 import mt19937, untemper
-from mt19937predictor import MT19937Predictor
-from naughty_nice import Block, Chain
+#!/usr/bin/env python
+"""SANS Holiday Hack Challenge 2021 - Bruteforce Frostavator."""
+import asyncio
+import itertools
+import random
+from typing import Optional, Tuple
+
+import aiohttp
+import click
+import tqdm
+
+GATES = ['AND', 'NAND', 'OR', 'NOR', 'XOR', 'XNOR']
 
 
-def extract_number_64(tliston):
-    # grab 2 32-bit random values
-    next1 = tliston.extract_number()
-    next2 = tliston.extract_number()
-    # transform them into a 64-bit value
-    bytes = bytearray()
-    bytes += next2.to_bytes(4, byteorder='big')
-    bytes += next1.to_bytes(4, byteorder='big')
-    return int.from_bytes(bytes, byteorder='big')
+def create_ascii_board(layout: list) -> str:
+    """Create an ASCII panel layout."""
+    g0 = f"{GATES[layout[0]]:^6}"
+    g1 = f"{GATES[layout[1]]:^6}"
+    g2 = f"{GATES[layout[2]]:^6}"
+    g3 = f"{GATES[layout[3]]:^6}"
+    g4 = f"{GATES[layout[4]]:^6}"
+    g5 = f"{GATES[layout[5]]:^6}"
+
+    return (
+        "Logic board layout:\n\n"
+        "  +------+   +------+   +------+\n"
+        f"  |{g0}|   |{g1}|   |{g2}|\n"
+        "  +------+   +------+   +------+\n"
+        "  +------+   +------+   +------+\n"
+        f"  |{g3}|   |{g4}|   |{g5}|\n"
+        "  +------+   +------+   +------+"
+    )
+
+
+async def fetch(
+        session: aiohttp.ClientSession,
+        perm: Tuple[int, ...]) -> Tuple[Optional[str], Tuple[int, ...]]:
+    """Have the Frostavator check a single permutation."""
+    url = "https://frostavator21.kringlecastle.com/check"
+    headers = {'dataType': 'json', 'contentType': 'application/json'}
+    data = {'id': "abc-123", 'config': perm}
+
+    async with session.post(url, headers=headers, json=data) as response:
+        resp = await response.json()
+        return resp.get('hash', None), perm
+
+
+async def bruteforce(pick_one: bool):
+    """Bruteforce the Frostavator."""
+    async with aiohttp.ClientSession() as session:
+        # Calculate all possible permutations for the 6 logic gates
+        perms = itertools.permutations([0, 1, 2, 3, 4, 5])
+        tasks = []
+
+        # Send out a '/check' request for each permutation
+        for perm in perms:
+            tasks.append(asyncio.create_task(fetch(session, perm)))
+
+        # Configure the progressbar
+        bar_format = "{l_bar}{bar:30}| {n_fmt}/{total_fmt} [{elapsed}]"
+        progressbar = tqdm.tqdm(
+            asyncio.as_completed(tasks),
+            total=len(tasks),
+            bar_format=bar_format
+        )
+        progressbar.set_description("Frostavating")
+        results = []
+
+        # Gather the results
+        for step in progressbar:
+            results.append(await step)
+
+        # Filter out invalid values
+        valids = [x[1] for x in results if x[0]]
+
+        if pick_one:
+            # Print one random entry
+            winner = list(valids[random.randrange(0, len(valids))])
+            print(f"frostavatorData: {winner}")
+            print(create_ascii_board(winner))
+        else:
+            # Print all entries
+            print(f"All {len(valids)} valid 'frostavatorData' values:")
+
+            for valid in valids:
+                print(f"{list(valid)} or {[GATES[x] for x in valid]}")
+
+
+@click.command()
+@click.option('--pick-one', is_flag=True, help='Show a single solution.')
+def cli(pick_one: bool):
+    asyncio.run(bruteforce(pick_one))
 
 
 if __name__ == '__main__':
-    # load the blockchain file
-    c2 = Chain(load=True, filename='blockchain.dat')
-
-    # print some blockchain stats
-    print(f'The chain contains {len(c2.blocks)} blocks')
-    print(f'First block has index {c2.blocks[0].index}')
-    print(f'Last block has index {c2.blocks[-1].index}')
-    
-    # get the nonce values from the blocks
-    nonce_list = []
-    for block in c2.blocks:
-        nonce_list.append(block.nonce)
-
-    # create a kmyk MT19937 PRNG predictor 
-    # https://github.com/kmyk/mersenne-twister-predictor
-    kmyk = MT19937Predictor()
-
-    # create a Tom Liston MT19937 PRNG predictor 
-    # https://github.com/tliston/mt19937
-    tliston = mt19937(0)
-
-    # use all but the final 5 nonces for kmyk
-    for nonce in nonce_list[:-5]:
-        kmyk.setrandbits(nonce, 64)
-
-    # use 312 64-bit nonces, excluding the final 5, for tliston
-    idx = 0
-    for nonce in nonce_list[-317:-5]:
-        # least significant 32-bit
-        tliston.MT[idx] = untemper(nonce & 0xFFFFFFFF)
-        # most significant 32-bit
-        tliston.MT[idx+1] = untemper((nonce >> 32) & 0xFFFFFFFF)
-        idx += 2
-
-    # generate the next 5 values and compare them to the final 5 in the blockchain
-    print('\nVerifying correctness using the last 5 blockchain nonces:')
-    print('\nIndex   kmyk              tliston           Blockchain        Check')
-    for i in range(5):
-        # blockchain verification value
-        nonce_next = nonce_list[-5+i]
-        # next kmyk value
-        kmyk_next = kmyk.getrandbits(64)
-        # next tliston value
-        tliston_next = extract_number_64(tliston)
-        # comparison table
-        print('%i  %16.16x  %16.16x  %16.16x  %r' % (
-            c2.blocks[-5+i].index,
-            kmyk_next,
-            tliston_next,
-            nonce_next,
-            (kmyk_next == tliston_next == nonce_next)
-        ))
-        assert(kmyk_next == tliston_next == nonce_next)
-
-    # predict the next 4 random values
-    print('\nGenerating the next values:')
-    print('\nIndex   kmyk              tliston')
-    for i in range(4):
-        # kmyk answer
-        kmyk_next = kmyk.getrandbits(64)
-        # tliston answer
-        tliston_next = extract_number_64(tliston)
-        # prediction table
-        print('%i  %16.16x  %16.16x' % (
-            c2.blocks[-1].index + i + 1,
-            kmyk_next,
-            tliston_next,
-        ))
+    cli()
 ```
 
 ## Random
