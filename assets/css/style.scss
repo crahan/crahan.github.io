@@ -1,7 +1,7 @@
 ---
 ---
 
-$header: #fff;
+$header: #63c0f5;
 
 @import "{{ site.theme }}";
 
@@ -12,7 +12,7 @@ $header: #fff;
 }
 
 header {
-    border-bottom: 1px dashed #aaa;
+    border-bottom: 1px dashed #888;
 }
 
 header h1 {
