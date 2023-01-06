@@ -10,3 +10,11 @@ $header: #FF0000;
   text-align: center;
   margin: 0;
 }
+
+header {
+    border-bottom: 1px dashed $header;
+}
+
+header h1 {
+    color: $header;
+}
