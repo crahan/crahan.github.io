@@ -1,7 +1,5 @@
 ## SANS Holiday Hack Challenge Write-Ups
 
-[![HHC2022](./assets/images/HHC2022.png)](https://n00.be/HolidayHackChallenge2022/)
-
 [![HHC2021](./assets/images/HHC2021.png)](https://n00.be/HolidayHackChallenge2021/)
 
 [![HHC2020](./assets/images/HHC2020.png)](https://n00.be/HolidayHackChallenge2020/)
