@@ -1,26 +1,12 @@
 ## SANS Holiday Hack Challenge Write-Ups
 
-### KringleCon V: Golden Rings
-
 [![HHC2022](./assets/images/HHC2022.png)](https://n00.be/HolidayHackChallenge2022/)
-
-
-### KringleCon IV: Calling Birds
 
 [![HHC2021](./assets/images/HHC2021.png)](https://n00.be/HolidayHackChallenge2021/)
 
-
-### KringleCon III: French Hens
-
 [![HHC2020](./assets/images/HHC2020.png)](https://n00.be/HolidayHackChallenge2020/)
 
-
-### KringleCon II: Turtle Doves
-
 [![HHC2019](./assets/images/HHC2019.png)](https://n00.be/HolidayHackChallenge2019/)
-
-
-### KringleCon
 
 [![HHC2018](./assets/images/HHC2018.png)](./files/CraHan%20-%20KringleCon%202018%20writeup.pdf)
 
