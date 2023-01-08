@@ -18,7 +18,7 @@
 > -- <cite>Jack Beauregard</cite>
 
 
-## Elsewhere
+## Socials
 
 - [Mastodon](https://mastodon.social/@crahan)
 - [Twitter](https://www.twitter.com/crahan)
