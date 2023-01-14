@@ -20,7 +20,7 @@
 
 ## Socials
 
-- [Mastodon](https://mastodon.social/@crahan)
+- [Mastodon](https://mastodon.social/@crahan){:rel="me"}
 - [Twitter](https://www.twitter.com/crahan)
 - [Instagram](https://instagram.com/crahan)
 - [Github](https://github.com/crahan)
